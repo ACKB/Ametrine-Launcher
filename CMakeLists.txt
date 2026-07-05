@@ -516,7 +516,7 @@ if(IOS)
     set(MACOSX_BUNDLE ON)
     set(AMETRINE_SOURCES
         src/ios/main.mm
-        src/ios/glfw_bypass.cpp
+        src/ios/glfw_bypass.mm
     )
     
     add_executable(AmetrineLauncher MACOSX_BUNDLE ${AMETRINE_SOURCES})
