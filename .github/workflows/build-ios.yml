@@ -74,9 +74,21 @@ jobs:
           mv Payload/AmetrineLauncher.app/java_runtimes/jre21-ios-aarch64 Payload/AmetrineLauncher.app/java_runtimes/jre21
           rm -rf jre21.zip jre21-extracted
           
+          # Crear directorio para Frameworks
+          mkdir -p Payload/AmetrineLauncher.app/Frameworks
+          
+          # Descargar y extraer MoltenVK para iOS
+          echo "Descargando MoltenVK v1.4.1..."
+          curl -L -o MoltenVK-ios.tar "https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-ios.tar"
+          mkdir -p moltenvk-extracted
+          tar -xf MoltenVK-ios.tar -C moltenvk-extracted
+          find moltenvk-extracted -name "libMoltenVK.dylib" -exec cp {} Payload/AmetrineLauncher.app/Frameworks/ \;
+          rm -rf MoltenVK-ios.tar moltenvk-extracted
+          
           # Realiza el pseudo-firmado con ldid para SideStore/TrollStore
           # Esto evita restricciones estrictas de firma y permite JIT/RAM extendida
           ldid -Ssrc/ios/Info.plist Payload/AmetrineLauncher.app/AmetrineLauncher || true
+          ldid -Ssrc/ios/Info.plist Payload/AmetrineLauncher.app/Frameworks/libMoltenVK.dylib || true
           
           # Empaqueta en formato .ipa conservando enlaces simbólicos de los JRE
           zip --symlinks -r AmetrineLauncher.ipa Payload
