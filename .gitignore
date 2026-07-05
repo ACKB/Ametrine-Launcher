@@ -1,17 +1,60 @@
-# Build directories
-build/
-build-ios/
-cmake-build-*/
-out/
+# Windows / OSX system files
+Thumbs.db
+.DS_Store
+*~
 
 # IDE files
-.vscode/
-.idea/
+*.kdev4
+.user
+.directory
 *.swp
 *.swo
-.DS_Store
+.vscode/
+.idea/
+.vs/
+*.pro.user
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+CMakeSettings.json
+CMakeUserPresets.json
+/.project
+/.settings
 
-# Temporary files
+# Compilation & Build files
+/CMakeFiles/
+resources/CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+Debug/
+compile_commands.json
+build/
+build-ios/
+/build-*
+out/
+install/
+/install-*
+
+# Temporary files & Logs
 *.log
 tmp/
 temp/
+tags
+.ycm_extra_conf.*
+.cache/
+
+# Project folders
+branding/
+secrets/
+run/
+
+# Nix/NixOS
+.direnv/
+outputs/
+result
+result-*
+repl-result-*
+
+# Flatpak & Snap
+.flatpak-builder/
+flatbuild/
+*.snap

@@ -63,6 +63,17 @@ Si acabas de clonar o iniciar este proyecto de forma local, sigue estos pasos pa
 - Herramienta **StikJit** o **StikDebug** activa inalámbricamente en tu red local para habilitar el compilador Just-In-Time (JIT) de Java.
 
 ### Entitlements recomendados (SideStore)
-El archivo [`Info.plist`](file:///src/Info.plist) ya incluye las llaves para solicitar la RAM extendida:
+El archivo [`Info.plist`](file:///src/ios/Info.plist) ya incluye las llaves para solicitar la RAM extendida:
 - `com.apple.developer.kernel.extended-virtual-addressing` (Habilitado)
 - `com.apple.developer.increased-memory-limit` (Habilitado)
+
+---
+
+## About Prism Launcher (Upstream Core)
+
+Prism Launcher is a custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once.
+This is a **fork** of the MultiMC Launcher and is **not** endorsed by it.
+
+All code of the upstream launcher is available under the GPL-3.0-only license.
+The logo and related assets are under the CC BY-SA 4.0 license.
+For detailed developer docs and instructions regarding upstream features, please visit [Prism Launcher Website](https://prismlauncher.org).
