@@ -79,21 +79,19 @@ Este reporte detalla el progreso actual del desarrollo, las configuraciones esta
 ## 1. Avances y Tareas Completadas (Cosas Hechas)
 
 *   **Inicialización del Repositorio Local**: Se inicializó el control de versiones con Git estableciendo la rama base `main` en la carpeta raíz `/home/ackb/Pictures/MC`.
-*   **Creación de la Configuración del Compilador**: Se desarrolló el archivo [CMakeLists.txt](file:///home/ackb/Pictures/MC/CMakeLists.txt) configurado especialmente para la compilación cruzada hacia iOS, integrando Qt 6 y los frameworks nativos de Apple (`UIKit`, `GameController`, `Metal`).
-*   **Workflow de Compilación en la Nube**: Se diseñó el workflow de GitHub Actions [build-ios.yml](file:///home/ackb/Pictures/MC/.github/workflows/build-ios.yml) que automatiza la compilación en runners virtuales de macOS, la instalación del SDK de Qt para iOS, el pseudo-firmado de seguridad y el empaquetado del artefacto ejecutable `.ipa`.
-*   **Configuración del Bundle de iOS**: Se implementó el archivo de manifiesto [Info.plist](file:///home/ackb/Pictures/MC/src/Info.plist) que declara el soporte nativo para mandos de videojuegos (`GCSupportedGamepads`) y solicita los privilegios de RAM extendida requeridos para SideStore.
-*   **Código de Entrada Inicial y Stubs**:
-    *   [main.mm](file:///home/ackb/Pictures/MC/src/main.mm): Punto de entrada nativo Objective-C++ que combina el ciclo de vida de UIKit de iPadOS y la inicialización de la interfaz de usuario en Qt.
-    *   [glfw_bypass.cpp](file:///home/ackb/Pictures/MC/src/glfw_bypass.cpp): Estructura del puente C++ para interceptar el framework `GameController` nativo de Apple y mapearlo directamente a `GLFWgamepadstate` de LWJGL.
-*   **Archivo de Ignorados de Git**: Se creó el archivo [.gitignore](file:///home/ackb/Pictures/MC/.gitignore) para omitir directorios de compilación temporal y archivos de configuración del IDE.
+*   **Fork e Integración del Core de Prism Launcher**: Se conectó el repositorio local con el código fuente oficial de Prism Launcher agregándolo como remoto `upstream`. Se descargó de forma eficiente y se fusionó la rama `develop` (vía shallow fetch de profundidad 1), convirtiendo el proyecto en un fork real.
+*   **Resolución de Conflictos en Fusión**: Se resolvieron satisfactoriamente los conflictos en archivos críticos ([.gitignore](file:///home/ackb/Pictures/MC/.gitignore), [README.md](file:///home/ackb/Pictures/MC/README.md) y [CMakeLists.txt](file:///home/ackb/Pictures/MC/CMakeLists.txt)) para conservar el código del core de Prism Launcher combinándolo con las optimizaciones locales.
+*   **Reorganización de Archivos Locales**: Se reubicaron los archivos fuente de iOS (`main.mm`, `glfw_bypass.cpp` e `Info.plist`) en una subcarpeta dedicada [src/ios/](file:///home/ackb/Pictures/MC/src/ios/) para prevenir colisiones con los fuentes originales de escritorio de Prism Launcher.
+*   **Integración en el Sistema de Construcción (CMake)**: Se adaptó el archivo principal [CMakeLists.txt](file:///home/ackb/Pictures/MC/CMakeLists.txt) para que, al detectar que compila para iOS (`if(IOS)`), cree el target ejecutable `AmetrineLauncher` vinculado directamente a la librería lógica estática de Prism Launcher (`Launcher_logic`) y a los frameworks de Apple (`UIKit`, `GameController`, `Metal`, `QuartzCore`, `Foundation`).
+*   **Workflow Optimizado para Compilación Cruzada**: Se modificó el pipeline automatizado en [.github/workflows/build-ios.yml](file:///home/ackb/Pictures/MC/.github/workflows/build-ios.yml) para que instale mediante Homebrew las dependencias de compilación (`cmark`, `tomlplusplus`) y configure CMake apuntando al archivo de toolchain oficial de Qt para iOS (`qt.toolchain.cmake`), asegurando el éxito de la compilación cruzada en la nube.
+*   **Configuración del Manifiesto**: El archivo [Info.plist](file:///home/ackb/Pictures/MC/src/ios/Info.plist) se configuró con permisos nativos para mandos Bluetooth de consolas (`GCSupportedGamepads`) y RAM extendida para SideStore.
 
 ## 2. Tareas Pendientes (Lo que Falta)
 
-*   **Integración del Core de Prism Launcher**: Agregar el código fuente completo de Prism Launcher al proceso de CMake (o configurarlo como un submódulo Git).
-*   **Implementación del Bypass de GLFW**: Escribir la lógica real de consulta en Objective-C++/C++ dentro del loop de GLFW para capturar los ejes y botones analógicos de los mandos físicos y mapearlos sin simulación de teclas de teclado.
-*   **Módulo Microsoft OAuth**: Adaptar y traducir la lógica de login de Amethyst/PojavLauncher al entorno C++/Qt de Ametrine Launcher para permitir el inicio de sesión oficial con cuentas de Microsoft.
-*   **Enlace de la JVM (Adoptium)**: Crear scripts de empaquetado que incrusten la build de OpenJDK 17/21 para iPadOS dentro de la carpeta Payload del archivo `.ipa`.
-*   **Integración de MoltenVK**: Vincular la librería MoltenVK (`libMoltenVK.dylib`) en el archivo `.ipa` para canalizar los comandos Vulkan del juego moderno directamente a Metal en la pantalla del iPad.
+*   **Implementación del Bypass de GLFW**: Escribir la lógica real de consulta en Objective-C++/C++ dentro del loop de GLFW para capturar los ejes y botones analógicos de los mandos físicos Bluetooth (`GCController`) y mapearlos a `GLFWgamepadstate` sin simulación virtual de teclas.
+*   **Adaptación del Módulo Microsoft OAuth**: Modificar e integrar la lógica de autenticación segura (MicrosoftAuthenticator / AccountManager) adaptándola del codebase de PojavLauncher para permitir el inicio de sesión oficial con cuentas de Mojang/Microsoft.
+*   **Incrustación de la JVM (Adoptium)**: Desarrollar scripts en el pipeline para inyectar y enlazar el runtime de Java (OpenJDK 17/21 ARM64 adaptado a iPadOS) dentro de la carpeta Payload del ejecutable empaquetado.
+*   **Integración de MoltenVK**: Vincular la librería estática o dinámica de MoltenVK (`libMoltenVK`) en la app para mapear las llamadas gráficas Vulkan de Minecraft Java hacia la API Metal nativa en el iPad.
 
 ## 3. Problemas Técnicas Identificados
 
@@ -103,7 +101,7 @@ Este reporte detalla el progreso actual del desarrollo, las configuraciones esta
 
 ## 4. Plan de Pruebas (Test)
 
-*   **Test del Workflow**: Realizar una primera subida al repositorio remoto de GitHub para validar que la descarga de Qt para iOS y la compilación con CMake en el entorno macOS-14 finalicen correctamente sin errores de compilación.
+*   **Test del Workflow**: Realizar una primera subida al repositorio remoto de GitHub para validar que la descarga de Qt para iOS, las dependencias (`cmark`, `tomlplusplus`) y la compilación de `Launcher_logic` y `AmetrineLauncher` en el entorno macOS-14 finalicen correctamente sin errores.
 *   **Prueba de Sideload en iPad M1 (8GB)**: Instalar la build `.ipa` resultante en el dispositivo target mediante SideStore y habilitar el "Extended RAM Entitlement" (permitiendo asignar 4-5.5 GB de RAM).
 *   **Verificación JIT**: Arrancar la JVM a través de StikJit y confirmar mediante consola que JIT está activo y optimizando el bytecode de Java.
 *   **Prueba de Mandos Bluetooth**: Conectar un mando Bluetooth (DualSense o Xbox) al iPad, iniciar una versión moderna de Minecraft con el mod Controlify y verificar si el juego detecta el mando físico sin configurar controles virtuales táctiles.
