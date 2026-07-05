@@ -53,12 +53,33 @@ jobs:
           # Copia el bundle generado
           cp -r build/Release-iphoneos/AmetrineLauncher.app Payload/
           
+          # Crear directorio para runtimes de Java
+          mkdir -p Payload/AmetrineLauncher.app/java_runtimes
+          
+          # Descargar y extraer JRE 17 para iOS
+          echo "Descargando JRE 17..."
+          curl -L -o jre17.zip "https://nightly.link/PojavLauncherTeam/android-openjdk-build-multiarch/workflows/build/buildjre17-21/jre17-ios-aarch64.zip"
+          mkdir -p jre17-extracted
+          unzip -q jre17.zip -d jre17-extracted
+          tar -xf jre17-extracted/jre17-ios-aarch64.tar.xz -C Payload/AmetrineLauncher.app/java_runtimes/
+          mv Payload/AmetrineLauncher.app/java_runtimes/jre17-ios-aarch64 Payload/AmetrineLauncher.app/java_runtimes/jre17
+          rm -rf jre17.zip jre17-extracted
+          
+          # Descargar y extraer JRE 21 para iOS
+          echo "Descargando JRE 21..."
+          curl -L -o jre21.zip "https://nightly.link/PojavLauncherTeam/android-openjdk-build-multiarch/workflows/build/buildjre17-21/jre21-ios-aarch64.zip"
+          mkdir -p jre21-extracted
+          unzip -q jre21.zip -d jre21-extracted
+          tar -xf jre21-extracted/jre21-ios-aarch64.tar.xz -C Payload/AmetrineLauncher.app/java_runtimes/
+          mv Payload/AmetrineLauncher.app/java_runtimes/jre21-ios-aarch64 Payload/AmetrineLauncher.app/java_runtimes/jre21
+          rm -rf jre21.zip jre21-extracted
+          
           # Realiza el pseudo-firmado con ldid para SideStore/TrollStore
           # Esto evita restricciones estrictas de firma y permite JIT/RAM extendida
           ldid -Ssrc/ios/Info.plist Payload/AmetrineLauncher.app/AmetrineLauncher || true
           
-          # Empaqueta en formato .ipa
-          zip -r AmetrineLauncher.ipa Payload
+          # Empaqueta en formato .ipa conservando enlaces simbólicos de los JRE
+          zip --symlinks -r AmetrineLauncher.ipa Payload
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
