@@ -22,7 +22,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           brew update
-          brew install cmake ninja ldid dpkg cmark tomlplusplus
+          brew install cmake ninja ldid dpkg cmark tomlplusplus qrencode libarchive
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
